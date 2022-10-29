@@ -1,0 +1,113 @@
+CREATE TABLE IF NOT EXISTS Students(
+	SIDNum INT NOT NULL UNIQUE,
+	LName CHAR(45) NOT NULL,
+    FName CHAR(45) NOT NULL,
+	SEadd VARCHAR(45) NOT NULL,
+    DormName CHAR(45) NOT NULL,
+    DormRoom_No INT NOT NULL,
+    offCampus_addr VARCHAR(45) NOT NULL,
+    PRIMARY KEY (SIDNum, LName, FName)
+);
+
+ALTER TABLE Students
+	ADD FAID_No INT NOT NULL UNIQUE;
+ALTER TABLE Students
+	ADD FAEmail_addr VARCHAR(45) NOT NULL UNIQUE;
+ALTER TABLE Students
+	ADD CPhoneNum VARCHAR(45) UNIQUE;
+ALTER TABLE Students
+	ADD CEadd CHAR(10) UNIQUE;
+-- ALTER TABLE Students
+-- 	ADD FOREIGN KEY (AFID_No) REFERENCES Faculty_Advisor (AFID_No);
+-- ALTER TABLE Students
+-- 	ADD FOREIGN KEY (AFEmail_addr) REFERENCES Faculty_Advisor (AFEmail_addr);
+-- ALTER TABLE Students
+-- 	ADD FOREIGN KEY (CEmail_addr) REFERENCES Mentors (CEmail_addr);
+-- ALTER TABLE Students
+-- 	ADD FOREIGN KEY (CPhoneNum) REFERENCES Mentors (CPhoneNum);
+
+CREATE TABLE IF NOT EXISTS Student_enrollment (
+    SIDNum INT NOT NULL UNIQUE,
+    enroll_status VARCHAR(45) NOT NULL,
+    graduation CHAR(45),
+    degree VARCHAR(45),
+    PRIMARY KEY (SIDNum),
+    FOREIGN KEY (SIDNum)
+        REFERENCES Students (SIDNum)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Alumni(
+	FID_Num INT NOT NULL UNIQUE,
+    FName VARCHAR(45) NOT NULL,
+    LName VARCHAR(45) NOT NULL,
+    home_addr VARCHAR(45) NOT NULL,
+    home_city VARCHAR(45) NOT NULL,
+    home_state VARCHAR(45) NOT NULL,
+    home_zip INT NOT NULL,
+    privPhoneNum CHAR(10) NOT NULL UNIQUE,
+    PRIMARY KEY(FID_Num),
+    FOREIGN KEY (FID_Num)
+        REFERENCES Students (SIDNum)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Faculty_member(
+	FID_No INT NOT NULL UNIQUE,
+    FFName VARCHAR(45) NOT NULL,
+    FLName VARCHAR(45) NOT NULL,
+    FEmail_addr VARCHAR(45) NOT NULL UNIQUE,
+    department VARCHAR(45) NOT NULL,
+    OfficeBuildingName VARCHAR(45) NOT NULL,
+    OfficeRoomNum VARCHAR(45) NOT NULL,
+    OfficePhoneNum CHAR(10) NOT NULL UNIQUE,
+    FID_No INT,
+    PRIMARY KEY(FID_No, FFName, FLName, FEmail_addr),
+    FOREIGN KEY (FID_No)
+        REFERENCES Alumni (FID_No)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Faculty_Advisor(
+	FAID_No INT NOT NULL UNIQUE,
+    FAEmail_addr VARCHAR(45) NOT NULL UNIQUE,
+    FAFName VARCHAR(45) NOT NULL,
+    FALName VARCHAR(45) NOT NULL,
+    PRIMARY KEY(FAID_No, FAEmail_addr),
+
+    FOREIGN KEY (FAID_No, FAFName, FALName, FAEmail_addr)
+        REFERENCES Faculty_member (FID_No, FFName, FLName, FEmail_addr)
+        ON DELETE CASCADE ON UPDATE CASCADE
+
+);
+
+CREATE TABLE IF NOT EXISTS Mentor_s_company(
+	CEmail_addr VARCHAR(45) NOT NULL UNIQUE,
+    CPhoneNum CHAR(10) NOT NULL UNIQUE,
+    CAddr VARCHAR(45) NOT NULL,
+    CCity VARCHAR(45) NOT NULL,
+    CState VARCHAR(45) NOT NULL,
+    CZip INT NOT NULL,
+    LName VARCHAR(45) NOT NULL,
+    FName VARCHAR(45) NOT NULL,
+    CName VARCHAR(45) NOT NULL,
+    FCID_Num INT,
+    PRIMARY KEY(CEmail_addr, CPhoneNum, CAddr),
+    FOREIGN KEY (FCID_Num)
+        REFERENCES Alumni (FCID_Num)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Mentors(
+	CEmail_addr VARCHAR(45) NOT NULL UNIQUE,
+    CPhoneNum CHAR(10) NOT NULL UNIQUE,
+    CAddr VARCHAR(45) NOT NULL,
+    CID_Num INT,
+    PRIMARY KEY(CEmail_addr, CPhoneNum),
+    FOREIGN KEY (CEmail_addr, CPhoneNum, CAddr)
+        REFERENCES Mentor_s_company (CEmail_addr, CPhoneNum, CAddr)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (CID_Num)
+        REFERENCES Students (CID_Num)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
